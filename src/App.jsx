@@ -7,6 +7,7 @@ import LineChartComponent from './components/LineChart';
 import PieChartComponent from './components/PieChart';
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Footer from "./components/Footer";
+import SpeedometerChart from "./components/Speedmeterchart";
 const App = () => {
   return (
     <>
@@ -47,6 +48,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/piechart",
         element: <PieChartComponent />
+      },
+      {
+        path: "/speedmetrechart",
+        element: <SpeedometerChart />
       }
     ]
   }
