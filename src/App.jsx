@@ -8,6 +8,7 @@ import PieChartComponent from './components/PieChart';
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Footer from "./components/Footer";
 import SpeedometerChart from "./components/Speedmeterchart";
+import FunnelChart from "./components/FunnelChart";
 const App = () => {
   return (
     <>
@@ -52,6 +53,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/speedmetrechart",
         element: <SpeedometerChart />
+      },
+      {
+        path: "/funnelchart",
+        element: <FunnelChart />
       }
     ]
   }

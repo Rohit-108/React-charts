@@ -22,6 +22,9 @@ const Header = () => {
                 <li className="hover:text-red-200 text-white text-lg">
                     <Link to="/speedmetrechart">Speedmetre Chart </Link>
                 </li>
+                <li className="hover:text-red-200 text-white text-lg">
+                    <Link to="/funnelchart">Funnel Chart </Link>
+                </li>
             </ul>
         </div>
     );

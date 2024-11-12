@@ -1,95 +1,103 @@
-import { useState, useEffect } from 'react';
-import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from 'recharts';
+import Title from "./Title";
+import { Sector, Cell, PieChart, Pie } from "recharts";
 
-const SpeedometerChart = () => {
-    const [speed, setSpeed] = useState(50);
+const SpeedMetreChart = () => {
+    const width = 600;
+    const chartValue = 80;
+    const colorData = [
+        { value: 40, color: "#4CAF50" },
+        { value: 40, color: "#FFC107" },
+        { value: 40, color: "#FF5722" },
+        { value: 40, color: "#03A9F4" },
+        { value: 40, color: "#9C27B0" },
+        { value: 40, color: "#FF9800" }
+    ];
 
-    const [data, setData] = useState([
-        { name: 'Speed', value: speed, fill: '#8884d8' },
-    ]);
+    const activeSectorIndex = colorData
+        .map((cur, index, arr) => {
+            const curMax = [...arr]
+                .splice(0, index + 1)
+                .reduce((a, b) => ({ value: a.value + b.value })).value;
+            return chartValue > curMax - cur.value && chartValue <= curMax;
+        })
+        .findIndex((cur) => cur);
 
-    useEffect(() => {
-        setData([{ name: 'Speed', value: speed, fill: getSpeedColor(speed) }]);
-    }, [speed]);
+    const sumValues = colorData.map((cur) => cur.value).reduce((a, b) => a + b);
 
-    const getSpeedColor = (speed) => {
-        if (speed < 30) return '#82ca9d';
-        if (speed < 70) return '#ffbb28';
-        return '#ff4d4f';
+    const arrowData = [
+        { value: chartValue },
+        { value: 0 },
+        { value: sumValues - chartValue }
+    ];
+
+    const pieProps = {
+        startAngle: 180,
+        endAngle: 0,
+        cx: width / 2,
+        cy: width / 2
     };
 
-    const calculateNeedleAngle = (speed) => {
-        return (speed / 100) * 180 - 90;
+    const pieRadius = {
+        innerRadius: "75%",
+        outerRadius: (width / 2) * 0.45
+    };
+
+    const Arrow = ({ cx, cy, midAngle, outerRadius }) => {
+        const RADIAN = Math.PI / 180;
+        const sin = Math.sin(-RADIAN * midAngle);
+        const cos = Math.cos(-RADIAN * midAngle);
+        const mx = cx + (outerRadius + width * 0.05) * cos;
+        const my = cy + (outerRadius + width * 0.05) * sin;
+        return (
+            <g>
+                <g transform={`translate(${cx}, ${cy}) rotate(${360 - midAngle})`}>
+                    <path
+                        d="M5.60469 9.37139C2.82684 9.54267 0.429368 7.66264 0.276978 5.19354C0.124588 2.72445 2.27269 0.564139 5.05054 0.392861L63.1551 1.279L5.60469 9.37139Z"
+                        fill="#2E2E2E"
+                    />
+                </g>
+                <text x={mx} y={my} textAnchor="middle" dominantBaseline="middle">
+                    {chartValue === 0 ? null : chartValue}
+                </text>
+            </g>
+        );
     };
 
     return (
-        <div className="flex flex-col items-center">
-            <ResponsiveContainer width="100%" height={400}>
-                <RadialBarChart
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="80%"
-                    outerRadius="100%"
-                    barSize={10}
-                    data={data}
-                    startAngle={180}
-                    endAngle={0}
+        <div className="flex flex-col justify-center items-center ">
+            <Title name="Speed Metre Chart" className="pt-10" />
+            <PieChart width={width} height={width / 2 + 30} className="mb-[100px]">
+                <text x={345} y={275} textAnchor="middle" dominantBaseline="middle">
+                    100
+                </text>
+                <text x={165} y={275} textAnchor="middle" dominantBaseline="middle">
+                    0
+                </text>
+
+                <Pie
+                    activeIndex={activeSectorIndex}
+                    innerRadius="60%"
+                    data={colorData}
+                    blendStroke
+                    fill="#8884d8"
+                    {...pieProps}
                 >
-                    <PolarAngleAxis
-                        type="number"
-                        domain={[0, 100]}
-                        angleAxisId={0}
-                        tick={false}
-                        axisLine={false}
-                        tickLine={false}
-                    />
-
-                    <RadialBar
-                        minAngle={15}
-                        clockWise
-                        dataKey="value"
-                        cornerRadius={10}
-                    />
-
-                    {/* Needle */}
-                    <line
-                        x1="50%"
-                        y1="80%"
-                        x2="50%"
-                        y2="40%"
-                        stroke="#000"
-                        strokeWidth="6"
-                        style={{
-                            transform: `rotate(${calculateNeedleAngle(speed)}deg)`,
-                            transformOrigin: '50% 85%',
-                            transition: 'transform 0.5s ease-out',
-                        }}
-                    />
-                </RadialBarChart>
-            </ResponsiveContainer>
-
-
-            <div className="mt-5 flex justify-center">
-                <button
-                    onClick={() => setSpeed((prev) => Math.max(prev - 10, 0))}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    Decrease Speed
-                </button>
-                <button
-                    onClick={() => setSpeed((prev) => Math.min(prev + 10, 100))}
-                    className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    Increase Speed
-                </button>
-            </div>
-
-
-            <div className="mt-5 text-center">
-                <h2 className="text-2xl font-semibold">{speed} km/h</h2>
-            </div>
+                    {colorData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={colorData[index].color} />
+                    ))}
+                </Pie>
+                <Pie
+                    stroke="none"
+                    activeIndex={1}
+                    activeShape={Arrow}
+                    data={arrowData}
+                    outerRadius={pieRadius.innerRadius}
+                    fill="none"
+                    {...pieProps}
+                />
+            </PieChart>
         </div>
     );
 };
 
-export default SpeedometerChart;
+export default SpeedMetreChart;

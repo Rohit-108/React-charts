@@ -1,4 +1,3 @@
-
 import Title from './Title';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { barChartData } from '../utills/chartData';
