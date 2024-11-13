@@ -17,12 +17,12 @@ const ApexChart = () => {
             plotOptions: {
                 bar: {
                     borderRadius: 0,
-                    horizontal: true,  // Keep it horizontal to go left to right
+                    horizontal: true,
                     barHeight: "80%",
                     isFunnel: true,
-                    // Remove gap between bars
-                    barWidth: '100%',  // Set bar width to 100% for no gap between bars
-                    distributed: true, // To make each bar have its distinct color, optional
+
+                    barWidth: '100%',
+                    distributed: true,
                 },
             },
             dataLabels: {
@@ -48,14 +48,14 @@ const ApexChart = () => {
                     "Verify",
                     "Offered",
                     "Hired",
-                ],  // Categories are now on the X-axis
+                ],
             },
             yaxis: {
                 labels: {
                     show: true,
                 },
                 title: {
-                    text: "Number of Candidates",  // Label on Y-axis showing candidate count
+                    text: "Number of Candidates",
                 },
             },
             legend: {
