@@ -25,6 +25,9 @@ const Header = () => {
                 <li className="hover:text-red-200 text-white text-lg">
                     <Link to="/funnelchart">Funnel Chart </Link>
                 </li>
+                <li className="hover:text-red-200 text-white text-lg">
+                    <Link to="/funnelapex">Funnel Chart with Apex </Link>
+                </li>
             </ul>
         </div>
     );

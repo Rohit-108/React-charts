@@ -9,6 +9,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Footer from "./components/Footer";
 import SpeedometerChart from "./components/Speedmeterchart";
 import FunnelChart from "./components/FunnelChart";
+import ApexChart from "./components/FuunelApex";
 const App = () => {
   return (
     <>
@@ -57,6 +58,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/funnelchart",
         element: <FunnelChart />
+      },
+      {
+        path: "/funnelapex",
+        element: <ApexChart />
       }
     ]
   }
