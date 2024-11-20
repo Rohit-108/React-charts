@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import SpeedometerChart from "./components/Speedmeterchart";
 import FunnelChart from "./components/FunnelChart";
 import ApexChart from "./components/FuunelApex";
+import Map from "./components/Map";
 const App = () => {
   return (
     <>
@@ -62,6 +63,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/funnelapex",
         element: <ApexChart />
+      },
+      {
+        path: "/map",
+        element: <Map />
       }
     ]
   }
