@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
-import "../App.css"
+import "../App.css";
 
 const customIcon = L.icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673188.png",
@@ -13,6 +13,7 @@ const customIcon = L.icon({
     iconAnchor: [20, 40],
     popupAnchor: [0, -40],
 });
+
 
 const createCustomClusterIcon = (cluster) => {
     const count = cluster.getChildCount();
@@ -30,15 +31,33 @@ const createCustomClusterIcon = (cluster) => {
     });
 };
 
+
+const CurrentLocationMarker = ({ setCurrentLocation }) => {
+    const map = useMapEvents({
+        locationfound: (location) => {
+            const { lat, lng } = location.latlng;
+            setCurrentLocation([lat, lng]);
+            map.setView([lat, lng], 10);
+        },
+    });
+
+    useEffect(() => {
+        map.locate({ setView: true, maxZoom: 10 });
+    }, [map]);
+
+    return null;
+};
+
 const Map = () => {
     const [locations, setLocations] = useState([
+        { lat: 28.641313436031897, lon: 77.41597015597313, name: "My Location" },
         { lat: 28.7041, lon: 77.1025, name: "Delhi" },
         { lat: 27.1767, lon: 78.0081, name: "Agra" },
         { lat: 26.9124, lon: 75.7873, name: "Jaipur" },
         { lat: 28.5355, lon: 77.3910, name: "Noida" },
     ]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [currentLocation, setCurrentLocation] = useState([28.63977, 77.42302]);
+    const [currentLocation, setCurrentLocation] = useState([28.641313436031897, 77.41597015597313]);
 
     const FitBounds = () => {
         const map = useMap();
@@ -75,7 +94,6 @@ const Map = () => {
 
     return (
         <div className="mx-auto w-full h-screen">
-            {/* Search Input */}
             <div className="flex top-4 left-4 bg-white shadow-md rounded-lg p-4 z-10">
                 <div className="flex space-x-2">
                     <input
@@ -97,7 +115,7 @@ const Map = () => {
             {/* Map */}
             <MapContainer
                 center={currentLocation}
-                zoom={6}
+                zoom={10}
                 style={{ height: "100%", width: "100%" }}
                 className="rounded-lg shadow-md"
             >
@@ -105,7 +123,7 @@ const Map = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
                 />
-                {/* Marker Cluster */}
+                <CurrentLocationMarker setCurrentLocation={setCurrentLocation} />
                 <MarkerClusterGroup
                     chunkedLoading
                     iconCreateFunction={createCustomClusterIcon}
@@ -119,9 +137,9 @@ const Map = () => {
                             <Popup>
                                 <strong>{loc.name}</strong>
                                 <br />
-                                Latitude: {loc.lat.toFixed(2)}
+                                Latitude: {loc.lat.toFixed(6)}
                                 <br />
-                                Longitude: {loc.lon.toFixed(2)}
+                                Longitude: {loc.lon.toFixed(6)}
                             </Popup>
                         </Marker>
                     ))}
