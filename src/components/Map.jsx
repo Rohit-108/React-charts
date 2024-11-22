@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polygon } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
-import "../App.css";
+import { polygonCoordinates } from "../utills/contest";
+
 
 const customIcon = L.icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673188.png",
@@ -14,137 +15,140 @@ const customIcon = L.icon({
     popupAnchor: [0, -40],
 });
 
-
-const createCustomClusterIcon = (cluster) => {
-    const count = cluster.getChildCount();
-    const size =
-        count < 10
-            ? "small"
-            : count < 100
-                ? "medium"
-                : "large";
-
-    return L.divIcon({
-        html: `<div class="custom-cluster-icon ${size}">${count}</div>`,
-        className: "custom-cluster",
-        iconSize: L.point(40, 40, true),
-    });
-};
-
-
-const CurrentLocationMarker = ({ setCurrentLocation }) => {
-    const map = useMapEvents({
-        locationfound: (location) => {
-            const { lat, lng } = location.latlng;
-            setCurrentLocation([lat, lng]);
-            map.setView([lat, lng], 10);
-        },
-    });
-
-    useEffect(() => {
-        map.locate({ setView: true, maxZoom: 10 });
-    }, [map]);
-
-    return null;
-};
-
 const Map = () => {
+    const [currentLocation, setCurrentLocation] = useState([28.63977, 77.42302]);
     const [locations, setLocations] = useState([
-        { lat: 28.641313436031897, lon: 77.41597015597313, name: "My Location" },
         { lat: 28.7041, lon: 77.1025, name: "Delhi" },
         { lat: 27.1767, lon: 78.0081, name: "Agra" },
         { lat: 26.9124, lon: 75.7873, name: "Jaipur" },
         { lat: 28.5355, lon: 77.3910, name: "Noida" },
     ]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [currentLocation, setCurrentLocation] = useState([28.641313436031897, 77.41597015597313]);
+    const [suggestions, setSuggestions] = useState([]);
+    const [isFocused, setIsFocused] = useState(false);
 
-    const FitBounds = () => {
-        const map = useMap();
-        useEffect(() => {
-            const bounds = L.latLngBounds(locations.map((loc) => [loc.lat, loc.lon]));
-            if (bounds.isValid()) {
-                map.fitBounds(bounds);
-            }
-        }, [locations, map]);
-        return null;
+    const fetchSuggestions = async (query) => {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
+        );
+        const data = await response.json();
+        setSuggestions(data);
     };
 
-    const handleSearch = async () => {
-        try {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
-            );
-            const data = await response.json();
+    const handleSearchInputChange = (e) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+        fetchSuggestions(value);
+    };
 
-            if (data.length > 0) {
-                const { lat, lon } = data[0];
-                setLocations([
-                    ...locations,
-                    { lat: parseFloat(lat), lon: parseFloat(lon), name: searchQuery },
-                ]);
-                setCurrentLocation([parseFloat(lat), parseFloat(lon)]);
-            } else {
-                alert("Location not found!");
-            }
-        } catch (error) {
-            console.error("Error fetching location:", error);
+    const handleSelectSuggestion = (suggestion) => {
+        setSearchQuery(suggestion.display_name);
+        setCurrentLocation([parseFloat(suggestion.lat), parseFloat(suggestion.lon)]);
+        setSuggestions([]);
+    };
+
+    const handleShowMyLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setCurrentLocation([latitude, longitude]);
+                },
+                (error) => {
+                    console.error("Error fetching location:", error);
+                    alert("Could not get your location.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by this browser.");
         }
     };
 
+    const MapComponent = () => {
+        const map = useMap();
+
+        useEffect(() => {
+            map.setView(currentLocation, 13);
+        }, [currentLocation, map]);
+
+        return null;
+    };
+
+
     return (
-        <div className="mx-auto w-full h-screen">
-            <div className="flex top-4 left-4 bg-white shadow-md rounded-lg p-4 z-10">
-                <div className="flex space-x-2">
+        <div className="mx-5 mb-10 rounded-2xl shadow-lg bg-white p-5 ">
+            <div className="flex flex-row justify-center gap-x-3  mb-5 relative">
+                <div className="relative flex gap-x-3 ">
                     <input
                         type="text"
                         placeholder="Search location"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        onChange={handleSearchInputChange}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        className="w-[500px] h-10 border border-gray-300 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
+                    {(isFocused || searchQuery.length > 0) && suggestions.length > 0 && (
+                        <div className="absolute bg-white border border-gray-200 rounded-lg shadow-lg mt-1 w-[500px] z-10">
+                            {suggestions.map((suggestion, index) => (
+                                <div
+                                    key={index}
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleSelectSuggestion(suggestion)}
+                                >
+                                    {suggestion.display_name}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <button
-                        onClick={handleSearch}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                        onClick={() => fetchSuggestions(searchQuery)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md"
                     >
                         Search
                     </button>
+                    <button
+                        onClick={handleShowMyLocation}
+                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md"
+                    >
+                        Show My Location
+                    </button>
+
+
                 </div>
+
+
             </div>
 
-            {/* Map */}
             <MapContainer
                 center={currentLocation}
-                zoom={10}
-                style={{ height: "100%", width: "100%" }}
-                className="rounded-lg shadow-md"
+                zoom={13}
+                style={{ height: "500px", width: "100%" }}
+                className="relative rounded-lg overflow-hidden shadow-lg"
             >
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
                 />
-                <CurrentLocationMarker setCurrentLocation={setCurrentLocation} />
-                <MarkerClusterGroup
-                    chunkedLoading
-                    iconCreateFunction={createCustomClusterIcon}
-                >
+                <MarkerClusterGroup>
                     {locations.map((loc, index) => (
-                        <Marker
-                            key={index}
-                            position={[loc.lat, loc.lon]}
-                            icon={customIcon}
-                        >
-                            <Popup>
-                                <strong>{loc.name}</strong>
-                                <br />
-                                Latitude: {loc.lat.toFixed(6)}
-                                <br />
-                                Longitude: {loc.lon.toFixed(6)}
-                            </Popup>
+                        <Marker key={index} position={[loc.lat, loc.lon]} icon={customIcon}>
+                            <Popup>{loc.name}</Popup>
                         </Marker>
                     ))}
                 </MarkerClusterGroup>
-                <FitBounds />
+                <Marker position={currentLocation} icon={customIcon}>
+                    <Popup>You are here</Popup>
+                </Marker>
+                <Polygon
+                    positions={polygonCoordinates}
+                    color="blue"
+                    weight={2}
+                    opacity={0.8}
+                    fillColor="blue"
+                    fillOpacity={0.3}
+                />
+                <MapComponent />
             </MapContainer>
         </div>
     );
