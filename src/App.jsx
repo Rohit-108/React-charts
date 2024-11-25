@@ -1,6 +1,6 @@
 
 import Header from "./components/Header";
-
+import store from "./store/store"
 import AreaChartComponent from './components/AreaChart';
 import BarChartComponent from './components/BarChart';
 import LineChartComponent from './components/LineChart';
@@ -11,10 +11,16 @@ import SpeedometerChart from "./components/Speedmeterchart";
 import FunnelChart from "./components/FunnelChart";
 import ApexChart from "./components/FuunelApex";
 import Map from "./components/Map";
+import { Provider } from "react-redux";
+
+
 const App = () => {
+
   return (
     <>
-      <RouterProvider router={appRouter} />
+      <Provider store={store}>
+        <RouterProvider router={appRouter} />
+      </Provider>
     </>
   );
 };
@@ -38,27 +44,27 @@ const appRouter = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <AreaChartComponent />
+        element: <AreaChartComponent chartId="areaChartData" />
       },
       {
         path: "/barchart",
-        element: <BarChartComponent />
+        element: <BarChartComponent chartId="barChartData" />
       },
       {
         path: "/linechart",
-        element: <LineChartComponent />
+        element: <LineChartComponent chartId="lineChartData" />
       },
       {
         path: "/piechart",
-        element: <PieChartComponent />
+        element: <PieChartComponent chartId="pieChartData" />
       },
       {
         path: "/speedmetrechart",
-        element: <SpeedometerChart />
+        element: <SpeedometerChart chartId="colorData" />
       },
       {
         path: "/funnelchart",
-        element: <FunnelChart />
+        element: <FunnelChart chartId="funnelChartData" />
       },
       {
         path: "/funnelapex",

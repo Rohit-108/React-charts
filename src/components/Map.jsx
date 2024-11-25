@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polygon } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import L from "leaflet";
@@ -6,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import { polygonCoordinates } from "../utills/contest";
-
+import { setCurrentLocation, setSuggestions } from "../store/mapSlice";
 
 const customIcon = L.icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673188.png",
@@ -16,15 +17,12 @@ const customIcon = L.icon({
 });
 
 const Map = () => {
-    const [currentLocation, setCurrentLocation] = useState([28.63977, 77.42302]);
-    const [locations, setLocations] = useState([
-        { lat: 28.7041, lon: 77.1025, name: "Delhi" },
-        { lat: 27.1767, lon: 78.0081, name: "Agra" },
-        { lat: 26.9124, lon: 75.7873, name: "Jaipur" },
-        { lat: 28.5355, lon: 77.3910, name: "Noida" },
-    ]);
+    const dispatch = useDispatch();
+    const currentLocation = useSelector((state) => state.map.currentLocation);
+    const locations = useSelector((state) => state.map.locations)
+    const suggestions = useSelector((state) => state.map.suggestions);
+
     const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
     const [isFocused, setIsFocused] = useState(false);
 
     const fetchSuggestions = async (query) => {
@@ -32,7 +30,7 @@ const Map = () => {
             `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`
         );
         const data = await response.json();
-        setSuggestions(data);
+        dispatch(setSuggestions(data));
     };
 
     const handleSearchInputChange = (e) => {
@@ -43,8 +41,8 @@ const Map = () => {
 
     const handleSelectSuggestion = (suggestion) => {
         setSearchQuery(suggestion.display_name);
-        setCurrentLocation([parseFloat(suggestion.lat), parseFloat(suggestion.lon)]);
-        setSuggestions([]);
+        dispatch(setCurrentLocation([parseFloat(suggestion.lat), parseFloat(suggestion.lon)]));
+        dispatch(setSuggestions([]));
     };
 
     const handleShowMyLocation = () => {
@@ -52,7 +50,7 @@ const Map = () => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setCurrentLocation([latitude, longitude]);
+                    dispatch(setCurrentLocation([latitude, longitude]));
                 },
                 (error) => {
                     console.error("Error fetching location:", error);

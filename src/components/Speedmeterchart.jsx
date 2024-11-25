@@ -1,17 +1,11 @@
+import { useSelector } from "react-redux";
 import Title from "./Title";
 import { Sector, Cell, PieChart, Pie } from "recharts";
 
-const SpeedMetreChart = () => {
+const SpeedMetreChart = ({ chartId }) => {
     const width = 600;
     const chartValue = 80;
-    const colorData = [
-        { value: 40, color: "#4CAF50" },
-        { value: 40, color: "#FFC107" },
-        { value: 40, color: "#FF5722" },
-        { value: 40, color: "#03A9F4" },
-        { value: 40, color: "#9C27B0" },
-        { value: 40, color: "#FF9800" }
-    ];
+    const colorData = useSelector((state) => state.chartData.chartData[chartId])
 
     const activeSectorIndex = colorData
         .map((cur, index, arr) => {

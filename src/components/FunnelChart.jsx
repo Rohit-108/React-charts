@@ -1,27 +1,20 @@
 
+import { useSelector } from 'react-redux';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-    { category: 'One', value: 10 },
-    { category: 'Two', value: 9 },
-    { category: 'Three', value: 6 },
-    { category: 'Four', value: 5 },
-    { category: 'Five', value: 4 },
-    { category: 'Six', value: 3 },
-    { category: 'Seven', value: 1 }
-];
 
+const FunnelChart = ({ chartId }) => {
 
-const colors = [
-    "#0693e3", "#0a7fd6", "#0c6bc9", "#0e57bc", "#1043af", "#1230a2", "#141d95"
-];
+    const funnelChartData = useSelector((state) => state.chartData.chartData[chartId]);
+    const colors = [
+        "#0693e3", "#0a7fd6", "#0c6bc9", "#0e57bc", "#1043af", "#1230a2", "#141d95"
+    ]
 
-const FunnelChart = () => {
     return (
         <div className='flex justify-center'>
             <ResponsiveContainer width="50%" height={500}>
                 <BarChart
-                    data={data}
+                    data={funnelChartData}
                     layout="horizontal"
                     margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
                     barCategoryGap={0}
@@ -52,7 +45,7 @@ const FunnelChart = () => {
                         dataKey="value"
                         shape={(props) => {
                             const { x, y, width, index } = props;
-                            const barHeight = data[index].value * 30;
+                            const barHeight = funnelChartData[index].value * 30;
                             const centerY = (500 - barHeight) / 2;
 
                             return (

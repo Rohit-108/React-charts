@@ -1,15 +1,12 @@
 import Title from './Title';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-import { areaChartData } from '../utills/chartData';
 import { CustomLegend, CustomTooltip, CustomXAxisTick } from './CustomComponent';
+import { useSelector } from 'react-redux';
 
+const AreaChartComponent = ({ chartId }) => {
 
+    const areaChartData = useSelector((state) => state.chartData.chartData[chartId]);
 
-
-
-
-const AreaChartComponent = () => {
     return (
         <div className='flex flex-col justify-center items-center p-5'>
             <Title name="Area Chart" />
