@@ -8,6 +8,9 @@ const Header = () => {
             </div>
             <ul className="flex justify-center space-x-6 ">
                 <li className="hover:text-red-200 text-white text-center text-lg">
+                    <Link to="/product">Products</Link>
+                </li>
+                <li className="hover:text-red-200 text-white text-center text-lg">
                     <Link to="/">AreaChart</Link>
                 </li>
                 <li className="hover:text-red-200 text-white text-lg">

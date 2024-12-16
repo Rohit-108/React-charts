@@ -12,6 +12,7 @@ import FunnelChart from "./components/FunnelChart";
 import ApexChart from "./components/FuunelApex";
 import Map from "./components/Map";
 import { Provider } from "react-redux";
+import Products from "./components/Products"
 
 
 const App = () => {
@@ -73,7 +74,11 @@ const appRouter = createBrowserRouter([
       {
         path: "/map",
         element: <Map />
-      }
+      },
+      {
+        path: "/product",
+        element: <Products />
+      },
     ]
   }
 ])
