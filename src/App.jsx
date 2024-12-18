@@ -13,6 +13,7 @@ import ApexChart from "./components/FuunelApex";
 import Map from "./components/Map";
 import { Provider } from "react-redux";
 import Products from "./components/Products"
+import ComposedChartComponent from "./components/ComposedChart";
 
 
 const App = () => {
@@ -78,6 +79,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/product",
         element: <Products />
+      },
+      {
+        path: "/composedchart",
+        element: <ComposedChartComponent />
       },
     ]
   }

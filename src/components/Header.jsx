@@ -10,6 +10,9 @@ const Header = () => {
                 <li className="hover:text-red-200 text-white text-center text-lg">
                     <Link to="/product">Products</Link>
                 </li>
+                <li className="hover:text-red-200 text-white text-lg">
+                    <Link to="/composedchart">ComposedChart</Link>
+                </li>
                 <li className="hover:text-red-200 text-white text-center text-lg">
                     <Link to="/">AreaChart</Link>
                 </li>
